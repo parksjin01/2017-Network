@@ -64,6 +64,16 @@ public class Server {
     			this.client = client;							// Receive socket instance from parent to communicate with client
     		}
         
+//    		public static String stringToHex(String s) {
+//    		    String result = "";
+//
+//    		    for (int i = 0; i < s.length(); i++) {
+//    		      result += String.format("%02X ", (int) s.charAt(i));
+//    		    }
+//
+//    		    return result;
+//    		  }
+    		
         public void run()
         {
         	try {
@@ -74,7 +84,7 @@ public class Server {
 		    dout = new DataOutputStream(s_out); 
         		
 	        while(true){
-	        		String command = din.readUTF();				// Receive command from client
+	        		String command = din.readUTF().toString();				// Receive command from client
 	        		System.out.print(command);
 	        		if (command.equalsIgnoreCase("UPLOAD") || command.equalsIgnoreCase("DOWNLOAD"))
 	        		{
@@ -102,6 +112,33 @@ public class Server {
 	        				data.close();
 	        			}
 		        }
+	        		
+	        		else if (command.equalsIgnoreCase("DELETE"))
+	        		{
+	        			JSONParser parser = new JSONParser();
+	        			JSONObject fileInfo = (JSONObject)parser.parse(din.readUTF());
+	        			String file[] = db.searchFile(fileInfo.get("fileID").toString(), "file_id", fileInfo.get("range").toString()).split("12345");
+	        			String user[] = db.searchUser(fileInfo.get("userID").toString()).split("12345");
+	        			if (file[0].equalsIgnoreCase(user[0]) && user[1].equalsIgnoreCase(fileInfo.get("password").toString()))
+	        			{
+		        			File f = new File("/Users/Knight/upload/"+file[2]);
+		        			f.delete();
+		        			db.deleteFile(file[1]);
+		        			db.updateUser(user[0], user[1], user[2], user[3], user[4], user[5], user[6], Double.parseDouble(user[7]), Double.parseDouble(user[8])-Double.parseDouble(file[6]));
+		        			System.out.println("File deleted");
+	        			}
+	        			else
+	        			{
+	        				System.out.println("You can't delete it");
+	        			}
+	        			
+	        		}
+	        		
+	        		else if (command.equalsIgnoreCase("BACKUP") || command.equalsIgnoreCase("DELETE_BACKUP"))
+	        		{
+	        			new UpdownData(client, command).run();
+	        		}
+	        		
 	        		else if (command.equalsIgnoreCase("SIGNUP"))
 	        		{
 	        			// If command is signup
@@ -150,6 +187,7 @@ public class Server {
 	        			{
 	        				JSONObject tmpJSON = new JSONObject();
 	        				String tmp[] = files[i].split("12345");
+//	        				System.out.println(db.searchFile(searchKey.get("keyword").toString(), searchKey.get("std").toString(), searchKey.get("range").toString()));
 	        				tmpJSON.put("userID"	, tmp[0]);
 	        				tmpJSON.put("fileID", tmp[1]);
 	        				tmpJSON.put("fileName", tmp[2]);
@@ -160,6 +198,7 @@ public class Server {
 	        				tmpJSON.put("date", tmp[7]);
 	        				tmpJSON.put("shareOffset", tmp[8]);
 	        				tmpJSON.put("download", tmp[9]);
+	        				tmpJSON.put("backup", tmp[10]);
 	        				result.add(tmpJSON);
 	        			}
 	        			output.put("files", result);
@@ -191,7 +230,7 @@ public class Server {
 	        			// Change file table and user table.
 	        			// Change file flag to 0 which means this file is set to be share
 	        			// Change user storage field. Minus storage field with file size 
-	        			db.updateFile(file[0], file[1], file[2], file[3], file[4], file[5], Double.parseDouble(file[6]), file[7], "0", Integer.parseInt(file[9]));
+	        			db.updateFile(file[0], file[1], file[2], file[3], file[4], file[5], Double.parseDouble(file[6]), file[7], "0", Integer.parseInt(file[9]), Integer.parseInt(file[10]));
 	        			db.updateUser(user[0], user[1], user[2], user[3], user[4], user[5], user[6], Double.parseDouble(user[7]), Double.parseDouble(user[8])-Double.parseDouble(file[6]));
 	        			
 	        		}
@@ -209,7 +248,7 @@ public class Server {
 	        			// Change file table and user table.
 	        			// Change file flag to 1 which means this file isn't share
 	        			// Change user storage field. Add storage field with file size
-	        			db.updateFile(file[0], file[1], file[2], file[3], file[4], file[5], Double.parseDouble(file[6]), file[7], "1", Integer.parseInt(file[9]));
+	        			db.updateFile(file[0], file[1], file[2], file[3], file[4], file[5], Double.parseDouble(file[6]), file[7], "1", Integer.parseInt(file[9]), Integer.parseInt(file[10]));
 	        			db.updateUser(user[0], user[1], user[2], user[3], user[4], user[5], user[6], Double.parseDouble(user[7]), Double.parseDouble(user[8])+Double.parseDouble(file[6]));
 	        		}
 	        		else if (command.equalsIgnoreCase("CREATEGROUP"))
@@ -289,7 +328,7 @@ public class Server {
 	        			JSONObject info = (JSONObject)parser.parse(din.readUTF());
 	        			// Search file table with information which is parsed from message user send and update file
 	        			String file[] = db.searchFile(info.get("fileID").toString(), "file_id", "1").split("12345");
-	        			db.updateFile(file[0], file[1], file[2], file[3], file[4], file[5], Double.parseDouble(file[6]), file[7], info.get("groupID").toString(), Integer.parseInt(file[9]));
+	        			db.updateFile(file[0], file[1], file[2], file[3], file[4], file[5], Double.parseDouble(file[6]), file[7], info.get("groupID").toString(), Integer.parseInt(file[9]), Integer.parseInt(file[10]));
 	        		}
 	        		else if (command.equalsIgnoreCase("GROUP2PRIVATE"))
 	        		{
@@ -299,7 +338,7 @@ public class Server {
 	        			JSONObject info = (JSONObject)parser.parse(din.readUTF());
 	        			// Search file table with information which is parsed from message user send and update file
 	        			String file[] = db.searchFile(info.get("fileID").toString(), "file_id", info.get("groupID").toString()).split("12345");
-	        			db.updateFile(file[0], file[1], file[2], file[3], file[4], file[5], Double.parseDouble(file[6]), file[7], "1", Integer.parseInt(file[9]));
+	        			db.updateFile(file[0], file[1], file[2], file[3], file[4], file[5], Double.parseDouble(file[6]), file[7], "1", Integer.parseInt(file[9]), Integer.parseInt(file[10]));
 	        		}
 	        		else if (command.equalsIgnoreCase("PUBLIC2GROUP"))
 	        		{
@@ -311,7 +350,7 @@ public class Server {
 	        			// and update file table and user table
 	        			String file[] = db.searchFile(info.get("fileID").toString(), "file_id", "0").split("12345");
 	        			String user[] = db.searchUser(info.get("userID").toString()).split("12345");
-	        			db.updateFile(file[0], file[1], file[2], file[3], file[4], file[5], Double.parseDouble(file[6]), file[7], info.get("groupID").toString(), Integer.parseInt(file[9]));
+	        			db.updateFile(file[0], file[1], file[2], file[3], file[4], file[5], Double.parseDouble(file[6]), file[7], info.get("groupID").toString(), Integer.parseInt(file[9]), Integer.parseInt(file[10]));
 	        			db.updateUser(user[0], user[1], user[2], user[3], user[4], user[5], user[6], Double.parseDouble(user[7]), Double.parseDouble(user[8])+Double.parseDouble(file[6]));
 	        		}
 	        		else if (command.equalsIgnoreCase("GROUP2PUBLIC"))
@@ -324,7 +363,7 @@ public class Server {
 	        			// and update file table and user table
 	        			String file[] = db.searchFile(info.get("fileID").toString(), "file_id", info.get("groupID").toString()).split("12345");
 	        			String user[] = db.searchUser(info.get("userID").toString()).split("12345");
-	        			db.updateFile(file[0], file[1], file[2], file[3], file[4], file[5], Double.parseDouble(file[6]), file[7], "0", Integer.parseInt(file[9]));
+	        			db.updateFile(file[0], file[1], file[2], file[3], file[4], file[5], Double.parseDouble(file[6]), file[7], "0", Integer.parseInt(file[9]), Integer.parseInt(file[10]));
 	        			db.updateUser(user[0], user[1], user[2], user[3], user[4], user[5], user[6], Double.parseDouble(user[7]), Double.parseDouble(user[8])-Double.parseDouble(file[6]));
 	        		}
 	        		else if (command.equalsIgnoreCase("SEARCHUSER"))
@@ -379,12 +418,21 @@ public class Server {
 		private DataOutputStream dout = null;
 		private Socket client = null;
 		private String command = null;
+		private static String backUp_IP = "127.0.0.1";
+		private static int backUp_PORT = 11112;
+		private String sync_file = null;
+		
+		public UpdownData(Socket client, String command, String sync_file)
+		{
+			this.client = client;
+			this.command = command;
+			this.sync_file = sync_file;
+		}
 		
 		public UpdownData(Socket client, String command)
 		{
 			this.client = client;
 			this.command = command;
-			
 		}
     
     public void run()
@@ -405,23 +453,19 @@ public class Server {
         		JSONObject fileinfo = (JSONObject)parser.parse(din.readUTF());
         		
 	            long data = din.readLong();					// receive length of file to upload
-		        String filename = din.readUTF();				// receive name of file to upload
-		        File file = new File("/Users/Knight/upload/"+filename);	// Create file with name which is received from client
+		        String filename[] = din.readUTF().split("/");				// receive name of file to upload
+		        File file = new File("/Users/Knight/upload/"+filename[filename.length-1]);	// Create file with name which is received from client
 		        out = new FileOutputStream(file);           
-		 		
+
 		        // If file is already exist in server then don't upload file.
-		        if(db.searchFile(fileinfo.get("fileID").toString(), "file_id", "1") != "")
-		        {
-		        		dout.writeUTF("EXIST");
-		        		System.out.println("File already exist");
-		        }else
-		        {
 			        	dout.writeUTF("NOTEXIST");
 			        	
 			        	// Insert file information which is parsed from message user send and update user table.
-			        db.insertFile(fileinfo.get("userID").toString(), fileinfo.get("fileID").toString(), filename, fileinfo.get("type").toString(),
+			        db.insertFile(fileinfo.get("userID").toString(), fileinfo.get("fileID").toString(), filename[filename.length-1], fileinfo.get("type").toString(),
 	        				fileinfo.get("category").toString(), fileinfo.get("directory").toString(), Double.parseDouble(fileinfo.get("size").toString()),
-	        				fileinfo.get("date").toString(), fileinfo.get("shareOffset").toString(), 0);
+	        				fileinfo.get("date").toString(), fileinfo.get("shareOffset").toString(), 0, 0);
+			        
+			        System.out.println(filename[filename.length-1]);
 			        
 			        // Set file offset as 1 which means don't sharing this file.
 			        if(fileinfo.get("shareOffset").toString().equalsIgnoreCase("1"))
@@ -442,7 +486,12 @@ public class Server {
 		        }
 		        
 		        System.out.println("약: "+datas+" kbps");
+		        String searchFile[] = db.searchFile(fileinfo.get("fileID").toString(), "file_id", "1").split("12345");  
+		        if(searchFile.length != 0 && searchFile[10].equalsIgnoreCase("1"))
+		        {
+		        		new UpdownData(this.client, "BACKUP").run();
 		        }
+		        
 		        out.flush();
 		        out.close();
 	        }
@@ -459,10 +508,34 @@ public class Server {
         			// Search file table with information which is parsed from message user send
         			String fi[] = db.searchFile(fileinfo.get("name").toString(), "name", fileinfo.get("range").toString()).split("12345");
         			System.out.print(filename);
+        			File f = null;
+        			
+        			f = new File("/Users/Knight/upload/"+filename);
+        			if ((f.exists()))
+        			{
+        				dout.writeUTF("File open success");
+        			}else
+        			{
+        				if(fileinfo.get("user").toString().equalsIgnoreCase(fi[0]) && fi[10].equalsIgnoreCase("1"))
+        				{
+        					dout.writeUTF("File couldn't be opened, Do you want backup(Y/N) ");
+        					if(din.readUTF().equalsIgnoreCase("Y"))
+        					{
+        						UpdownData ud = new UpdownData(this.client, "SYNC", fi[1]);
+        						ud.run();
+        						ud.join();
+        					}
+        				}
+        				else
+        				{
+        					dout.writeUTF("File couldn't be opened");
+        					return;
+        				}
+        			}
         			
         			if(fileinfo.get("range").toString() == "0" && fi[0] != fileinfo.get("user").toString())
         			{
-        				db.updateFile(fi[0], fi[1], fi[2], fi[3], fi[4], fi[5], Double.parseDouble(fi[6]), fi[7], fi[8], Integer.parseInt(fi[9])+1);
+        				db.updateFile(fi[0], fi[1], fi[2], fi[3], fi[4], fi[5], Double.parseDouble(fi[6]), fi[7], fi[8], Integer.parseInt(fi[9])+1, Integer.parseInt(fi[10]));
         				if((Integer.parseInt(fi[9]) + 1)%10 == 0)
         				{
         					String user[] = db.searchUser(fi[0]).split("12345");
@@ -470,8 +543,6 @@ public class Server {
         				}
         				
         			}
-        			
-        			File f = new File(filename);
 	            
 			    byte[] buffer = new byte[1024];        // Buffer to store segment of file
 			    int len;                               // Length of file
@@ -497,6 +568,122 @@ public class Server {
 			        s_out.write(buffer,0,len);       
 			    }
         		} 
+        	
+        		else if (command.equalsIgnoreCase("BACKUP"))
+        		{
+        			InputStream b_in = null;
+        			FileOutputStream b_out = null;
+        			DataInputStream b_din = null;
+        			OutputStream b_s_out = null;
+        			DataOutputStream b_dout = null;
+        			FileInputStream b_fin = null;
+        			Socket sock = new Socket(backUp_IP, backUp_PORT);
+        			String file[] = null;
+        			
+        			b_in = sock.getInputStream();                
+        		    b_din = new DataInputStream(b_in);  
+        		    b_s_out = sock.getOutputStream();                 
+        		    b_dout = new DataOutputStream(b_s_out);
+        			
+        		    b_dout.writeUTF(command);
+        			String fileID = din.readUTF();
+        			b_dout.writeUTF(fileID);
+        			file = db.searchFile(fileID, "file_id", "1").split("12345");
+        			File f = new File(file[2]);
+        			
+        			byte[] buffer = new byte[1024];        // Buffer to store segment of file
+    			    int len;                               // Length of file
+    			    long data=f.length();
+    	        
+    			    if(data%1024 != 0 )					// Calculate file size. Standard unit is KB
+    			    {
+    			    		data = data/1024 + 1;
+    			    }else
+    			    {
+    			    		data = data/1024;
+    			    }
+    			    
+    			    b_dout.writeLong(data);
+    			    
+    			    long datas = data;                      
+    			 
+    			    b_fin = new FileInputStream(file[2]);   
+    			    b_dout.writeLong(data);                   // Send length of file to client
+    			        
+    			    len = 0;
+    			        
+    			    for(;data>0;data--){                 // Send segment of file to client. size of segment is 1 KB  
+    			    		len = b_fin.read(buffer);        
+    			        b_s_out.write(buffer,0,len);       
+    			    }
+    			    
+    			    db.updateFile(file[0], file[1], file[2], file[3], file[4], file[5], Double.parseDouble(file[6]), file[7], file[8], 0, 1);
+        		}
+        	
+        		else if (command.equalsIgnoreCase("SYNC"))
+        		{
+        			InputStream b_in = null;
+        			FileOutputStream b_out = null;
+        			DataInputStream b_din = null;
+        			OutputStream b_s_out = null;
+        			DataOutputStream b_dout = null;
+        			FileInputStream b_fin = null;
+        			Socket sock = new Socket(backUp_IP, backUp_PORT);
+        			
+        			b_in = sock.getInputStream();                
+        		    b_din = new DataInputStream(b_in);  
+        		    b_s_out = sock.getOutputStream();                 
+        		    b_dout = new DataOutputStream(b_s_out);
+        		    
+        		    b_dout.writeUTF(command);
+        			String fileinfo[] = db.searchFile(this.sync_file, "file_id", "1").split("12345");				// receive name of file to upload
+        			b_dout.writeUTF(fileinfo[1]);
+    	            long data = b_din.readLong();					// receive length of file to upload
+    		        File file = new File("/Users/Knight/upload/"+fileinfo[2]);	// Create file with name which is received from client
+    		        out = new FileOutputStream(file);           
+    		        
+    		        // If file is already exist in server then don't upload file.
+    			        	
+    			        	// Insert file information which is parsed from message user send and update user table.
+    			        
+    			        
+    			        long datas = data;                     
+    			        byte[] buffer = new byte[1024];        // Buffer to store segment of file
+    			        int len;                               
+    			        
+    			        
+    			        for(;data>0;data--){                   // Receive file segment from client `data` times
+    			            len = b_in.read(buffer);
+    			            out.write(buffer,0,len);
+    		        }
+    		        
+    		        System.out.println("약: "+datas+" kbps");
+    		        out.flush();
+    		        out.close();
+        		}
+        	
+        		else if (command.equalsIgnoreCase("DELETE_BACKUP"))
+        		{
+        			InputStream b_in = null;
+        			FileOutputStream b_out = null;
+        			DataInputStream b_din = null;
+        			OutputStream b_s_out = null;
+        			DataOutputStream b_dout = null;
+        			FileInputStream b_fin = null;
+        			Socket sock = new Socket(backUp_IP, backUp_PORT);
+        			
+        			
+        			b_in = sock.getInputStream();                
+        		    b_din = new DataInputStream(b_in);  
+        		    b_s_out = sock.getOutputStream();                 
+        		    b_dout = new DataOutputStream(b_s_out);
+        		    
+        		    b_dout.writeUTF(command);
+        		    String fileID = din.readUTF();
+        		    b_dout.writeUTF(fileID);
+        		    String file[] = db.searchFile(fileID, "file_id", "1").split("12345");
+        		    db.updateFile(file[0], file[1], file[2], file[3], file[4], file[5], Double.parseDouble(file[6]), file[7], file[8], 0, 0);
+        		}
     	} catch (Exception e)
     	{
     		System.out.println(e);
