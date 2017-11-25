@@ -152,10 +152,10 @@ public class DB_Connection {
 			   }
 		   
 		   public boolean insertFile(String user_id, String file_id, String file_name, String type, String category, String directory,
-		         double size, String date, String share_offset, int download) throws ClassNotFoundException, SQLException{
+		         double size, String date, String share_offset, int download, int backup) throws ClassNotFoundException, SQLException{
 		      
 		      Connection con = getConnection();
-		      String sql = "insert into file(user_id,file_id,file_name,type,category,directory,size,date,share_offset, download) values(?,?,?,?,?,?,?,?,?,?)";
+		      String sql = "insert into file(user_id,file_id,file_name,type,category,directory,size,date,share_offset, download, backup) values(?,?,?,?,?,?,?,?,?,?,?)";
 		      PreparedStatement pst = con.prepareStatement(sql);
 		      
 		      pst.setString(1, user_id);
@@ -168,6 +168,7 @@ public class DB_Connection {
 		      pst.setString(8, date);
 		      pst.setString(9, share_offset);
 		      pst.setInt(10, download);
+		      pst.setInt(11, backup);
 		      
 		      int res = pst.executeUpdate();
 		      if(res>0){
@@ -178,10 +179,10 @@ public class DB_Connection {
 		   }
 		   
 		   public  boolean updateFile(String user_id, String file_id, String file_name, String type, String category, String directory,
-		         double size, String date, String share_offset, int download) throws ClassNotFoundException, SQLException{
+		         double size, String date, String share_offset, int download, int backup) throws ClassNotFoundException, SQLException{
 		      
 		      Connection con = getConnection();
-		      String sql = "update file set user_id = ?, file_id = ?, file_name = ?, type = ?, category = ?, directory = ?, size = ?, date = ?, share_offset = ?, download = ? where file_id = ?";
+		      String sql = "update file set user_id = ?, file_id = ?, file_name = ?, type = ?, category = ?, directory = ?, size = ?, date = ?, share_offset = ?, download = ?, backup = ? where file_id = ?";
 		      PreparedStatement pst = con.prepareStatement(sql);
 		      
 		      pst.setString(1, user_id);
@@ -194,7 +195,8 @@ public class DB_Connection {
 		      pst.setString(8, date);
 		      pst.setString(9, share_offset);
 		      pst.setInt(10, download);
-		      pst.setString(11, file_id);
+		      pst.setInt(11, backup);
+		      pst.setString(12, file_id);
 		      
 		      int res = pst.executeUpdate();
 		      if(res>0){
@@ -224,7 +226,7 @@ public class DB_Connection {
 		   
 		   public  String searchFile(String keyword, String std, String range) throws ClassNotFoundException, SQLException{
 			      Connection con = getConnection();
-			      String sql = null;
+			      String sql = "";
 			      if (std.equals("name"))
 			      {
 			    	  	sql = "SELECT * FROM file WHERE file_name like '%" + keyword + "%' and share_offset = '" + range + "'";
@@ -234,6 +236,9 @@ public class DB_Connection {
 			      }else if(std.equals("category"))
 			      {
 			    	  	sql = "SELECT * FROM file WHERE category = '" + keyword + "' and share_offset = '" + range + "'";
+			      }else if(std.equalsIgnoreCase("user") && range.equalsIgnoreCase("all"))
+			      {
+			    	  sql = "SELECT * FROM file WHERE user_ID = '" + keyword + "'";
 			      }else if(std.equals("user"))
 			      {
 			    	  	sql = "SELECT * FROM file WHERE user_ID = '" + keyword + "' and share_offset = '" + range + "'";
@@ -241,6 +246,7 @@ public class DB_Connection {
 			      {
 			    	  	sql = "SELECT * FROM file WHERE file_ID = '" + keyword + "' and share_offset = '" + range + "'";
 			      }
+			      
 			      ResultSet rs = null;
 			      Statement st = null;
 			      String result = "";
@@ -260,9 +266,10 @@ public class DB_Connection {
 			    	  	result += rs.getDouble(7)+"12345";
 			    	  	result += rs.getString(8)+"12345";
 			    	  	result += rs.getString(9)+"12345";
-			    	  	result += rs.getInt(10);
+			    	  	result += rs.getInt(10)+"12345";
+			    	  	result += rs.getInt(11);
 			      }
-			      
+			      			      
 			      if (result.length() == 0)
 			      {
 			    	  return "";
