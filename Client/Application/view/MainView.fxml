@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.controller.MainViewController">
+   <children>
+      <SplitPane layoutY="14.0" orientation="VERTICAL" prefHeight="614.0" prefWidth="1000.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <items>
+            <SplitPane dividerPositions="0.08496732026143791" orientation="VERTICAL" prefHeight="205.0" prefWidth="998.0">
+              <items>
+                  <SplitPane dividerPositions="0.22645290581162325, 0.5" prefHeight="200.0" prefWidth="200.0">
+                     <items>
+                        <TextField fx:id="CloudTextField" prefHeight="23.0" prefWidth="246.0" />
+                        <Button fx:id="CloudSearchBtn" minWidth="47.0" mnemonicParsing="false" onAction="#CloudSearchAction" prefHeight="23.0" prefWidth="69.0" text="검색" />
+                        <ButtonBar prefHeight="72.0" prefWidth="592.0">
+                          <buttons>
+                              <Button fx:id="refreshBtn" layoutX="125.0" layoutY="14.0" mnemonicParsing="false" onAction="#refreshAction" prefHeight="23.0" text="파일업로드" />
+                              <Button fx:id="CloudFileUploadBtn" mnemonicParsing="false" onAction="#CloudFileUploadAction" prefHeight="23.0" text="파일업로드" />
+                              <Button fx:id="FileDownloadBtn" mnemonicParsing="false" onAction="#FileDownloadAction" text="파일다운로드" />
+                              <Button fx:id="DeleteFileBtn" mnemonicParsing="false" onAction="#DeleteFileAction" text="파일삭제" />
+                            <Button fx:id="LoginBtn" alignment="TOP_CENTER" contentDisplay="RIGHT" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" onAction="#LoginViewAction" prefHeight="23.0" text="로그인" />
+                              <Button fx:id="SignUpBtn" alignment="TOP_CENTER" contentDisplay="RIGHT" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" onAction="#SignUpAction" prefHeight="23.0" text="회원가입" />
+                          </buttons>
+                        </ButtonBar>
+                     </items>
+                  </SplitPane>
+                  <SplitPane dividerPositions="0.3016032064128257" prefHeight="160.0" prefWidth="200.0">
+                    <items>
+                        <SplitPane dividerPositions="0.04308797127468582" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0">
+                          <items>
+                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="35.0" prefWidth="298.0">
+                                 <children>
+                                    <Label layoutX="109.0" layoutY="5.0" prefHeight="70.0" prefWidth="298.0" text="웹 하드 저장소" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                 </children>
+                              </AnchorPane>
+                              <SplitPane dividerPositions="0.5" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0">
+                                <items>
+                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
+                                       <children>
+                                          <Button fx:id="CreateGroupView" mnemonicParsing="false" onAction="#CreateGroupViewAction" prefHeight="23.0" prefWidth="113.0" text="그룹생성" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="185.0" AnchorPane.topAnchor="20.0" />
+                                          <Button fx:id="InviteViewBtn" mnemonicParsing="false" onAction="#InviteViewAction" prefHeight="23.0" prefWidth="120.0" text="그룹초대" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="178.0" AnchorPane.topAnchor="50.0" />
+                                          <Button fx:id="outGroupViewBtn" mnemonicParsing="false" onAction="#outGroupViewAction" prefHeight="23.0" prefWidth="120.0" text="그룹나가기" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="178.0" AnchorPane.topAnchor="80.0" />
+                                          <Button fx:id="Private2PublicBtn" mnemonicParsing="false" onAction="#Private2PublicAction" prefHeight="23.0" prefWidth="133.0" text="프라이핏에서 퍼블릭" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="165.0" AnchorPane.topAnchor="110.0" />
+                                          <Button fx:id="Public2PrivateBtn" mnemonicParsing="false" onAction="#Public2PrivateAction" prefHeight="23.0" prefWidth="120.0" text="퍼블릭에서 프라이빗" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="178.0" AnchorPane.topAnchor="140.0" />
+                                          <Button fx:id="FileBackupBtn" mnemonicParsing="false" onAction="#FileBackupAction" prefHeight="23.0" prefWidth="95.0" text="파일백업" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="203.0" AnchorPane.topAnchor="170.0" />
+                                          <Button fx:id="BackupDelectBtn" mnemonicParsing="false" onAction="#BackupDelectAction" prefHeight="23.0" prefWidth="87.0" text="백업삭제" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="211.0" AnchorPane.topAnchor="200.0" />
+                                          <Button fx:id="Group2PrivateBtn" layoutX="135.0" layoutY="50.0" mnemonicParsing="false" onAction="#Group2PrivateAction" prefHeight="23.0" prefWidth="106.0" text="Group2Private" AnchorPane.leftAnchor="135.0" AnchorPane.rightAnchor="57.0" />
+                                          <Button fx:id="Group2PublicBtn" layoutX="140.0" layoutY="80.0" mnemonicParsing="false" onAction="#Group2PublicAction" text="Group2Public" />
+                                          <Button fx:id="Private2GroupBtn" layoutX="144.0" layoutY="110.0" mnemonicParsing="false" onAction="#Private2GroupAction" text="Private2Group" />
+                                          <Button fx:id="Public2GroupBtn" layoutX="146.0" layoutY="140.0" mnemonicParsing="false" onAction="#Public2GroupAction" text="Public2Group" />
+                                       </children>
+                                    </AnchorPane>
+                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="280.0" prefWidth="298.0">
+                                       <children>
+                                          <TableView fx:id="GroupTabel" layoutX="49.0" layoutY="31.0" prefHeight="262.0" prefWidth="298.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                            <columns>
+                                              <TableColumn fx:id="GroupName" prefWidth="150.0" text="그룹이름" />
+                                              <TableColumn fx:id="Count" prefWidth="137.0" text="유저" />
+                                            </columns>
+                                          </TableView>
+                                       </children>
+                                    </AnchorPane>
+                                </items>
+                              </SplitPane>
+                          </items>
+                        </SplitPane>
+                      <AnchorPane fx:id="testTableAp" minHeight="0.0" minWidth="0.0" prefHeight="225.0" prefWidth="609.0">
+                           <children>
+                              <TableView fx:id="CloudFileTable" layoutY="14.0" prefHeight="546.0" prefWidth="694.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                <columns>
+                                  <TableColumn fx:id="Name" prefWidth="191.0" text="파일이름 " />
+                                  <TableColumn fx:id="Category" minWidth="1.0" prefWidth="97.0" text="카테고리" />
+                                    <TableColumn fx:id="Date" prefWidth="146.0" text="날짜" />
+                                    <TableColumn fx:id="Size" prefWidth="115.0" text="용량" />
+                                    <TableColumn fx:id="UserID" prefWidth="182.0" text="올린사람" />
+                                </columns>
+                              </TableView>
+                           </children>
+                        </AnchorPane>
+                    </items>
+                  </SplitPane>
+              </items>
+            </SplitPane>
+        </items>
+      </SplitPane>
+   </children>
+</AnchorPane>

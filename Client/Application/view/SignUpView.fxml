@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+
+
+<AnchorPane prefHeight="310.0" prefWidth="284.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8.0.141" fx:controller="application.controller.SignUpViewController">
+   <children>
+      <AnchorPane layoutY="44.0" prefHeight="470.0" prefWidth="284.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <GridPane layoutY="145.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">
+              <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+              </rowConstraints>
+               <children>
+                  <Label text="아이디" />
+                  <Label text="패스워드" GridPane.rowIndex="1" />
+                  <Label text="이름" GridPane.rowIndex="3" />
+                  <Label text="핸드폰" GridPane.rowIndex="4" />
+                  <Label text="주소" GridPane.rowIndex="5" />
+                  <Label text="이메일" GridPane.rowIndex="6" />
+                  <Label text="성별" GridPane.rowIndex="7" />
+                  <Label text="패스워드 재확인" GridPane.rowIndex="2" />
+                  <TextField fx:id="IDField" GridPane.columnIndex="1" />
+                  <TextField fx:id="PasswordField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <TextField fx:id="rePasswordField" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                  <TextField fx:id="NameField" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                  <TextField fx:id="PhoneField" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                  <TextField fx:id="AddressField" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                  <TextField fx:id="EmailField" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                  <TextField fx:id="SexField" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+               </children>
+            </GridPane>
+            <ButtonBar layoutX="41.0" layoutY="386.0" prefHeight="40.0" prefWidth="200.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+              <buttons>
+                <Button fx:id="SignUpBtn" mnemonicParsing="false" onAction="#SignUpAction" text="확인" />
+                  <Button fx:id="CancelBtn" layoutX="235.0" layoutY="19.0" mnemonicParsing="false" onAction="#CancelAction" text="취소" />
+              </buttons>
+            </ButtonBar>
+         </children>
+      </AnchorPane>
+   </children>
+</AnchorPane>
