@@ -1,152 +1,486 @@
 package Term_Project;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.ServerSocket;
-import java.net.Socket;
-import Term_Project.DB_Connection;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
+public class DB_Connection {
 
-public class Backup_Server {
+	public Connection getConnection() throws ClassNotFoundException, SQLException{
+	      
+	      Connection con = null;
+
+	      Class.forName("com.mysql.jdbc.Driver");
+	      con = DriverManager.getConnection("jdbc:mysql://localhost:3306/gaft", "root", "Sj199402");
+	      
+	      return con;
+	   }
+	   
+	   public void selectAll() throws ClassNotFoundException, SQLException{
+	      Connection con = getConnection();
+	      String sql = "SELECT * FROM USER";
+	      ResultSet rs = null;
+	      Statement st = null;
+	      
+	      st = con.createStatement();
+	      rs = st.executeQuery(sql);
+	      
+	      while(rs.next()){
+	         String user_id = rs.getString(1);
+	         String password = rs.getString(2);
+	         String name = rs.getString(3);
+	         String phone_number = rs.getString(4);
+	         String address = rs.getString(5);
+	         String e_mail = rs.getString(6);
+	         String sex = rs.getString(7);
+	           Double total_storage = rs.getDouble(8);
+	           Double usage_storage = rs.getDouble(9);
+	      }
+	      if(rs!= null) rs.close();
+	      if(st != null) st.close();
+	      if(con != null) con.close();
+	      
+	   }
+	   
+	   public boolean insertUser(String user_id, String password, String name, String phone_number, String address,
+		         String e_mail, String sex, double total_storage, double usage_storage) throws ClassNotFoundException, SQLException{
+		      
+		      Connection con = getConnection();
+		      String sql = "insert into user(user_id,password,name,phone_number,address,e_mail,sex,total_storage,usage_storage) values(?,?,?,?,?,?,?,?,?)";
+		      PreparedStatement pst = con.prepareStatement(sql);
+		      
+		      pst.setString(1, user_id);
+		      pst.setString(2, password);
+		      pst.setString(3, name);
+		      pst.setString(4, phone_number);
+		      pst.setString(5, address);
+		      pst.setString(6, e_mail);
+		      pst.setString(7, sex);
+		      pst.setDouble(8, total_storage);
+		      pst.setDouble(9, usage_storage);
+		      
+		      int res = pst.executeUpdate();
+		      if(res>0){
+		         return true;
+		      }
+		      else
+		         return false;
+		   }
+		   
+		   public boolean updateUser(String user_id, String password, String name, String phone_number, String address,
+		         String e_mail, String sex, double total_storage, double usage_storage) throws ClassNotFoundException, SQLException{
+		      
+		      Connection con = getConnection();
+		      String sql = "update user set user_id = ?, password = ?, name = ?, phone_number = ?, address = ?, e_mail = ?, sex = ?, total_storage = ?, usage_storage =? where user_id = ? and phone_number = ?";
+		      PreparedStatement pst = con.prepareStatement(sql);
+		      
+		      pst.setString(1, user_id);
+		      pst.setString(2, password);
+		      pst.setString(3, name);
+		      pst.setString(4, phone_number);
+		      pst.setString(5, address);
+		      pst.setString(6, e_mail);
+		      pst.setString(7, sex);
+		      pst.setDouble(8, total_storage);
+		      pst.setDouble(9, usage_storage);
+		      pst.setString(10, user_id);
+		      pst.setString(11, phone_number);
+		      
+		      int res = pst.executeUpdate();
+		      if(res>0){
+		         return true;
+		      }
+		      else
+		         return false;
+		      
+		   }
+		   
+		   public void deleteUser(String user_id, String phone_number) throws ClassNotFoundException, SQLException{
+		      
+		      Connection con = getConnection();
+		      String sql = "delete from user where user_id = ? and phone_number = ?";
+		      PreparedStatement pst = con.prepareStatement(sql);
+		      
+		      pst.setString(1, user_id);
+		      pst.setString(2, phone_number);
+		      
+		      int res = pst.executeUpdate();
+		      if(res>0){
+		         System.out.println("OK");
+		      }
+		      if(pst != null) pst.close();
+		      if(con != null) con.close();
+		      
+		   }
+		   
+		   public String searchUser(String user_ID) throws ClassNotFoundException, SQLException{
+			      Connection con = getConnection();
+			      String sql = "SELECT * FROM user WHERE user_ID = '" + user_ID + "'";
+			      String result = "";
+			      ResultSet rs = null;
+			      Statement st = null;
+			      
+			      st = con.createStatement();
+			      rs = st.executeQuery(sql);
+			      
+			      while(rs.next())
+			      {
+			    	  	result += "54321";
+			    	  	result += rs.getString(1)+"12345";
+			    	  	result += rs.getString(2)+"12345";
+			    	  	result += rs.getString(3)+"12345";
+			    	  	result += rs.getString(4)+"12345";
+			    	  	result += rs.getString(5)+"12345";
+			    	  	result += rs.getString(6)+"12345";
+			    	  	result += rs.getString(7)+"12345";
+			    	  	result += rs.getDouble(8)+"12345";
+			    	  	result += rs.getDouble(9);
+			      }
+			      if (result.length() == 0)
+			      {
+			    	  return "";
+			      }
+			      result = result.substring(5, result.length());
+			      
+			      if(st != null) st.close();
+			      if(con != null) con.close();
+			      
+			      return result;
+			   }
+		   
+		   public boolean insertFile(String user_id, String file_id, String file_name, String type, String category, String directory,
+		         double size, String date, String share_offset, int download, int backup) throws ClassNotFoundException, SQLException{
+		      
+		      Connection con = getConnection();
+		      String sql = "insert into file(user_id,file_id,file_name,type,category,directory,size,date,share_offset, download, backup) values(?,?,?,?,?,?,?,?,?,?,?)";
+		      PreparedStatement pst = con.prepareStatement(sql);
+		      
+		      pst.setString(1, user_id);
+		      pst.setString(2, file_id);
+		      pst.setString(3, file_name);
+		      pst.setString(4, type);
+		      pst.setString(5, category);
+		      pst.setString(6, directory);
+		      pst.setDouble(7, size);
+		      pst.setString(8, date);
+		      pst.setString(9, share_offset);
+		      pst.setInt(10, download);
+		      pst.setInt(11, backup);
+		      
+		      int res = pst.executeUpdate();
+		      if(res>0){
+		         return true;
+		      }
+		      else
+		         return false;
+		   }
+		   
+		   public  boolean updateFile(String user_id, String file_id, String file_name, String type, String category, String directory,
+		         double size, String date, String share_offset, int download, int backup) throws ClassNotFoundException, SQLException{
+		      
+		      Connection con = getConnection();
+		      String sql = "update file set user_id = ?, file_id = ?, file_name = ?, type = ?, category = ?, directory = ?, size = ?, date = ?, share_offset = ?, download = ?, backup = ? where file_id = ?";
+		      PreparedStatement pst = con.prepareStatement(sql);
+		      
+		      pst.setString(1, user_id);
+		      pst.setString(2, file_id);
+		      pst.setString(3, file_name);
+		      pst.setString(4, type);
+		      pst.setString(5, category);
+		      pst.setString(6, directory);
+		      pst.setDouble(7, size);
+		      pst.setString(8, date);
+		      pst.setString(9, share_offset);
+		      pst.setInt(10, download);
+		      pst.setInt(11, backup);
+		      pst.setString(12, file_id);
+		      
+		      int res = pst.executeUpdate();
+		      if(res>0){
+		         return true;
+		      }
+		      else
+		         return false;
+		      
+		   }
+		   
+		   public  void deleteFile(String file_id) throws ClassNotFoundException, SQLException{
+		      
+		      Connection con = getConnection();
+		      String sql = "delete from file where file_id = ?";
+		      PreparedStatement pst = con.prepareStatement(sql);
+		      
+		      pst.setString(1, file_id);
+		      
+		      int res = pst.executeUpdate();
+		      if(res>0){
+		         System.out.println("OK");
+		      }
+		      if(pst != null) pst.close();
+		      if(con != null) con.close();
+		      
+		   }
+		   
+		   public  String searchFile(String keyword, String std, String range) throws ClassNotFoundException, SQLException{
+			      Connection con = getConnection();
+			      String sql = "";
+			      if (std.equals("name"))
+			      {
+			    	  	sql = "SELECT * FROM file WHERE file_name like '%" + keyword + "%' and share_offset = '" + range + "'";
+			      }else if(std.equals("type"))
+			      {
+			    	  	sql = "SELECT * FROM file WHERE type = '" + keyword + "' and share_offset = '" + range + "'";
+			      }else if(std.equals("category"))
+			      {
+			    	  	sql = "SELECT * FROM file WHERE category = '" + keyword + "' and share_offset = '" + range + "'";
+			      }else if(std.equalsIgnoreCase("user") && range.equalsIgnoreCase("all"))
+			      {
+			    	  sql = "SELECT * FROM file WHERE user_ID = '" + keyword + "'";
+			      }else if(std.equals("user"))
+			      {
+			    	  	sql = "SELECT * FROM file WHERE user_ID = '" + keyword + "' and share_offset = '" + range + "'";
+			      }else if(std.equals("file_id"))
+			      {
+			    	  	sql = "SELECT * FROM file WHERE file_ID = '" + keyword + "' and share_offset = '" + range + "'";
+			      }
+			      
+			      ResultSet rs = null;
+			      Statement st = null;
+			      String result = "";
+			      
+			      st = con.createStatement();
+			      rs = st.executeQuery(sql);
+			      
+			      while(rs.next())
+			      {
+			    	  	result += "54321";
+			    	  	result += rs.getString(1)+"12345";
+			    	  	result += rs.getString(2)+"12345";
+			    	  	result += rs.getString(3)+"12345";
+			    	  	result += rs.getString(4)+"12345";
+			    	  	result += rs.getString(5)+"12345";
+			    	  	result += rs.getString(6)+"12345";
+			    	  	result += rs.getDouble(7)+"12345";
+			    	  	result += rs.getString(8)+"12345";
+			    	  	result += rs.getString(9)+"12345";
+			    	  	result += rs.getInt(10)+"12345";
+			    	  	result += rs.getInt(11);
+			      }
+			      			      
+			      if (result.length() == 0)
+			      {
+			    	  return "";
+			      }
+			      
+			      result = result.substring(5, result.length());
+			      
+			      if(st != null) st.close();
+			      if(con != null) con.close();
+			      
+			      return result;
+			   }
+		   
+		   public  boolean insertGroup(String group_id, String group_name, int headcount) throws ClassNotFoundException, SQLException{
+		      
+		      Connection con = getConnection();
+		      String sql = "insert into share_group(group_id,group_name,headcount) values(?,?,?)";
+		      PreparedStatement pst = con.prepareStatement(sql);
+		      
+		      pst.setString(1, group_id);
+		      pst.setString(2, group_name);
+		      pst.setInt(3, headcount);
+		      
+		      int res = pst.executeUpdate();
+		      if(res>0){
+		         return true;
+		      }
+		      else
+		         return false;
+		   }
+		   
+		   public  boolean updateGroup(String group_id, String group_name, int headcount) throws ClassNotFoundException, SQLException{
+		      
+		      Connection con = getConnection();
+		      String sql = "update share_group set group_id = ?, group_name = ?, headcount = ? where group_id = ?";
+		      PreparedStatement pst = con.prepareStatement(sql);
+		      
+		      pst.setString(1, group_id);
+		      pst.setString(2, group_name);
+		      pst.setInt(3, headcount);
+		      pst.setString(4, group_id);
+		      
+		      int res = pst.executeUpdate();
+		      if(res>0){
+		         return true;
+		      }
+		      else
+		         return false;
+		      
+		   }
+		   
+		   public  void deleteGroup(String group_id) throws ClassNotFoundException, SQLException{
+		      
+		      Connection con = getConnection();
+		      String sql = "delete from share_group where group_id = ?";
+		      PreparedStatement pst = con.prepareStatement(sql);
+		      
+		      pst.setString(1, group_id);
+		      
+		      int res = pst.executeUpdate();
+		      if(res>0){
+		         System.out.println("OK");
+		      }
+		      if(pst != null) pst.close();
+		      if(con != null) con.close();
+		      
+		   }
+		   
+		   public  String searchGroup(String group_id) throws ClassNotFoundException, SQLException{
+			      Connection con = getConnection();
+			      String sql = "SELECT * FROM share_group WHERE group_id = '" + group_id + "'";
+			      ResultSet rs = null;
+			      Statement st = null;
+			      String result = "";
+			      
+			      st = con.createStatement();
+			      rs = st.executeQuery(sql);
+			      
+			      while(rs.next())
+			      {
+			    	  	result += "54321";
+			    	  	result += rs.getString(1)+"12345";
+			    	  	result += rs.getString(2)+"12345";
+			    	  	result += rs.getString(3);
+			      }
+			      
+			      if (result.length() == 0)
+			      {
+			    	  return "";
+			      }
+			      
+			      result = result.substring(5, result.length());
+			      
+			      if(st != null) st.close();
+			      if(con != null) con.close();
+			      
+			      return result;
+			   }
+		   
+		   public  String searchGroupJoin(String user_id) throws ClassNotFoundException, SQLException{
+			      Connection con = getConnection();
+			      String sql = "SELECT * FROM group_member WHERE user_id = '" + user_id + "'";
+			      ResultSet rs = null;
+			      Statement st = null;
+			      String result = "";
+			      
+			      st = con.createStatement();
+			      rs = st.executeQuery(sql);
+			      
+			      while(rs.next())
+			      {
+			    	  	result += "12345" + rs.getString(1);
+			      }
+			      
+			      
+			      if (result.length() == 0)
+			      {
+			    	  return "";
+			      }
+			      
+			      result = result.substring(5, result.length());
+			      
+			      if(st != null) st.close();
+			      if(con != null) con.close();
+			      
+			      return result;
+			   }
+		   
+		   public  boolean insertGroupMember(String group_id, String user_id) throws ClassNotFoundException, SQLException{
+			      
+			      Connection con = getConnection();
+			      String sql = "insert into group_member(group_id, user_id) values(?,?)";
+			      PreparedStatement pst = con.prepareStatement(sql);
+			      
+			      pst.setString(1, group_id);
+			      pst.setString(2, user_id);
+			      
+			      int res = pst.executeUpdate();
+			      if(res>0){
+			         return true;
+			      }
+			      else
+			         return false;
+			   }
+			   
+			   public  boolean updateGroupMember(String group_id, String user_id) throws ClassNotFoundException, SQLException{
+			      
+			      Connection con = getConnection();
+			      String sql = "update group_member set group_id = ?, user_id = ? where group_id = ?";
+			      PreparedStatement pst = con.prepareStatement(sql);
+			      
+			      pst.setString(1, group_id);
+			      pst.setString(2, user_id);
+			      pst.setString(3, group_id);
+			      
+			      int res = pst.executeUpdate();
+			      if(res>0){
+			         return true;
+			      }
+			      else
+			         return false;
+			      
+			   }
+			   
+			   public  void deleteGroupMember(String group_id, String user_id) throws ClassNotFoundException, SQLException{
+			      
+			      Connection con = getConnection();
+			      String sql = "delete from group_member where group_id = ? and user_id = ?";
+			      PreparedStatement pst = con.prepareStatement(sql);
+			      
+			      pst.setString(1, group_id);
+			      pst.setString(2, user_id);
+			      
+			      int res = pst.executeUpdate();
+			      if(res>0){
+			         System.out.println("OK");
+			      }
+			      if(pst != null) pst.close();
+			      if(con != null) con.close();
+			      
+			   }
+			   
+			   public  String searchGroupMember(String group_id) throws ClassNotFoundException, SQLException{
+				      Connection con = getConnection();
+				      String sql = "SELECT * FROM group_member WHERE group_id = '" + group_id + "'";
+				      ResultSet rs = null;
+				      Statement st = null;
+				      String result = "";
+				      
+				      st = con.createStatement();
+				      rs = st.executeQuery(sql);
+				      
+				      while(rs.next())
+				      {
+				    	  	result += "54321";
+				    	  	result += rs.getString(1)+"12345";
+				    	  	result += rs.getString(2);
+				      }
+				      
+				      if (result.length() == 0)
+				      {
+				    	  return "";
+				      }
+				      
+				      result = result.substring(5, result.length());
+				      
+				      if(st != null) st.close();
+				      if(con != null) con.close();
+				      
+				      return result;
+				   }
 	
-	public static DB_Connection db = new DB_Connection();		// Create instance to connect with MYSQL DB
-	private static FileInputStream fin;						// Inputstream read from socket
 	
-	public static void main(String args[])
-	{
-		try {
-			ServerSocket server = new ServerSocket(11112);
-			Socket client = null;
-			System.out.println("Backup server start");
-			
-			while (true)
-			{
-				client = server.accept();
-				new UpdownData(client).start();
-				System.out.println("New client connected");
-			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
-	private static class UpdownData extends Thread
-    {
-    		private InputStream in = null;
-		private FileOutputStream out = null;
-		private DataInputStream din = null;
-		private OutputStream s_out = null;
-		private DataOutputStream dout = null;
-		private Socket client = null;
-		private String command = null;
-		
-		public UpdownData(Socket client)
-		{
-			this.client = client;
-			
-			try {
-				in = client.getInputStream();
-				din = new DataInputStream(in);  
-			    s_out = client.getOutputStream();    
-			    dout = new DataOutputStream(s_out);
-			    this.command = din.readUTF();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}			
-		}
-    
-    public void run()
-    {
-    	try {
-    		
-    		in = client.getInputStream();                
-	    din = new DataInputStream(in);  
-	    s_out = client.getOutputStream();                 
-	    dout = new DataOutputStream(s_out); 
-    		
-	    // If command is upload
-        	if (command.equalsIgnoreCase("BACKUP"))
-        	{	
-        			String filename = din.readUTF();				// receive name of file to upload
-	            long data = din.readLong();					// receive length of file to upload
-		        File file = new File("/Users/Knight/backup/"+filename);	// Create file with name which is received from client
-		        out = new FileOutputStream(file);           
-		 		
-		        // If file is already exist in server then don't upload file.
-			        	
-			        	// Insert file information which is parsed from message user send and update user table.
-			        
-			        
-			        long datas = data;                     
-			        byte[] buffer = new byte[1024];        // Buffer to store segment of file
-			        int len;                               
-			        
-			        
-			        for(;data>0;data--){                   // Receive file segment from client `data` times
-			            len = in.read(buffer);
-			            out.write(buffer,0,len);
-		        }
-		        
-		        System.out.println("약: "+datas+" kbps");
-		        out.flush();
-		        out.close();
-    	}
-        	
-        	// If command is download
-        		else if (command.equalsIgnoreCase("SYNC"))
-        		{
-        			String filename = din.readUTF(); 
-        			
-        			File f = new File("/Users/Knight/backup/"+filename);
-	            
-			    byte[] buffer = new byte[1024];        // Buffer to store segment of file
-			    int len;                               // Length of file
-			    long data=f.length();                 
-	        
-			    if(data%1024 != 0 )					// Calculate file size. Standard unit is KB
-			    {
-			    		data = data/1024 + 1;
-			    }else
-			    {
-			    		data = data/1024;
-			    }
-			    
-			    long datas = data;                      
-			 
-			    fin = new FileInputStream("/Users/Knight/backup/"+filename);   
-			    dout.writeLong(data);                   // Send length of file to client
-			        
-			    len = 0;
-			        
-			    for(;data>0;data--){                 // Send segment of file to client. size of segment is 1 KB  
-			    		len = fin.read(buffer);        
-			        s_out.write(buffer,0,len);       
-			    }
-			    
-			    System.out.println("약: "+datas+" kbps");
-        		} 
-        		else if (command.equalsIgnoreCase("DELETE_BACKUP"))
-        		{
-        			String filename = din.readUTF();
-        			File f = new File("/Users/Knight/backup/"+filename);
-        			f.delete();
-        			System.out.println("File deleted");
-        		}
-    	} catch (Exception e)
-    	{
-    		System.out.println(e);
-    		System.out.print(3);
-    	}
-    }
-    }
 }
