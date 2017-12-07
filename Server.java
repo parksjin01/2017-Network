@@ -16,12 +16,10 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Random;
 import java.util.*;
 import Term_Project.DB_Connection;
  
@@ -161,7 +159,7 @@ public class Server {
 	        			// Search user table with information which is parsed from message
 	        			// Send the result of login to client
 	        			String cur_user[] = db.searchUser(user.get("userID").toString()).split("12345");
-	        			if(cur_user[0].equals("userID") && cur_user[1].equals("password"))
+	        			if(cur_user[0].equals(user.get("userID").toString()) && cur_user[1].equals(user.get("password").toString()))
 	        			{
 	        				dout.writeUTF("Success");
 	        			}else
@@ -388,6 +386,32 @@ public class Server {
 	        			result.put("usageStorage", user[8]);
 	        			dout.writeUTF(result.toString());
 	        		}
+	        		else if(command.equalsIgnoreCase("GROUPSEARCH"))
+	        		{
+	        			JSONParser parser = new JSONParser();
+	        			JSONObject key = (JSONObject)parser.parse(din.readUTF());
+	        			String group[] = db.searchGroupJoin(key.get("userID").toString()).split("12345");
+	        			
+	        			JSONArray result = new JSONArray();
+	        			JSONObject output = new JSONObject();
+	        			
+	        			// Search file table with information which is parsed from message which client send
+	        			// Put the result of searching to JSON object and send it to client
+	        			for(int i=0; i<group.length; i++)
+	        			{
+	        				JSONObject tmpJSON = new JSONObject();
+	        				String tmp[] = db.searchGroup(group[i]).split("12345");
+//	        				System.out.println(db.searchFile(searchKey.get("keyword").toString(), searchKey.get("std").toString(), searchKey.get("range").toString()));
+	        				tmpJSON.put("groupID"	, tmp[0]);
+	        				tmpJSON.put("groupname", tmp[1]);
+	        				tmpJSON.put("headcount", tmp[2]);
+	        				tmpJSON.put("userID", key.get("userID").toString());
+	        				result.add(tmpJSON);
+	        			}
+	        			output.put("groups", result);
+	        			
+	        			dout.writeUTF(output.toString());
+	        		}
 	        		else if(command.equalsIgnoreCase("IDCHECK"))
 	        		{
 	        			// If command is idcheck
@@ -453,7 +477,7 @@ public class Server {
         		JSONObject fileinfo = (JSONObject)parser.parse(din.readUTF());
         		
 	            long data = din.readLong();					// receive length of file to upload
-		        String filename[] = din.readUTF().split("/");				// receive name of file to upload
+		        String filename[] = din.readUTF().split("\\");				// receive name of file to upload
 		        File file = new File("/Users/Knight/upload/"+filename[filename.length-1]);	// Create file with name which is received from client
 		        out = new FileOutputStream(file);           
 
@@ -504,10 +528,9 @@ public class Server {
         			JSONParser parser = new JSONParser();
         			JSONObject fileinfo = (JSONObject)parser.parse(din.readUTF());
         			String filename = fileinfo.get("name").toString(); 
-        			
+        			System.out.println(filename);
         			// Search file table with information which is parsed from message user send
         			String fi[] = db.searchFile(fileinfo.get("name").toString(), "name", fileinfo.get("range").toString()).split("12345");
-        			System.out.print(filename);
         			File f = null;
         			
         			f = new File("/Users/Knight/upload/"+filename);
@@ -556,21 +579,23 @@ public class Server {
 			    		data = data/1024;
 			    }
 			    
-			    long datas = data;                      
+			    long datas = data;             
 			 
-			    fin = new FileInputStream(filename);   
+			    fin = new FileInputStream(f);   
 			    dout.writeLong(data);                   // Send length of file to client
-			        
+
 			    len = 0;
 			        
 			    for(;data>0;data--){                 // Send segment of file to client. size of segment is 1 KB  
 			    		len = fin.read(buffer);        
 			        s_out.write(buffer,0,len);       
 			    }
+
         		} 
         	
         		else if (command.equalsIgnoreCase("BACKUP"))
         		{
+        			
         			InputStream b_in = null;
         			FileOutputStream b_out = null;
         			DataInputStream b_din = null;
@@ -589,7 +614,7 @@ public class Server {
         			String fileID = din.readUTF();
         			b_dout.writeUTF(fileID);
         			file = db.searchFile(fileID, "file_id", "1").split("12345");
-        			File f = new File(file[2]);
+        			File f = new File("/Users/Knight/upload/"+file[2]);
         			
         			byte[] buffer = new byte[1024];        // Buffer to store segment of file
     			    int len;                               // Length of file
@@ -603,11 +628,13 @@ public class Server {
     			    		data = data/1024;
     			    }
     			    
+    			    System.out.println(data);
+    			    
     			    b_dout.writeLong(data);
     			    
     			    long datas = data;                      
     			 
-    			    b_fin = new FileInputStream(file[2]);   
+    			    b_fin = new FileInputStream(f);   
     			    b_dout.writeLong(data);                   // Send length of file to client
     			        
     			    len = 0;
