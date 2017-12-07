@@ -5,7 +5,7 @@
  * 
  */
 
-package Term_Project;
+//package Term_Project;
 
 import java.io.DataInputStream;
 
@@ -21,7 +21,6 @@ import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
-import Term_Project.DB_Connection;
  
 public class Server {
 	
@@ -390,7 +389,7 @@ public class Server {
 	        		{
 	        			JSONParser parser = new JSONParser();
 	        			JSONObject key = (JSONObject)parser.parse(din.readUTF());
-	        			String group[] = db.searchGroupJoin(key.get("userID").toString()).split("12345");
+	        			String group[] = db.searchGroupMember(key.get("userID").toString()).split("12345");
 	        			
 	        			JSONArray result = new JSONArray();
 	        			JSONObject output = new JSONObject();
